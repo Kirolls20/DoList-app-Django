@@ -1,0 +1,19 @@
+{% extends 'base/base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class='header-bar'>
+   <div>
+      <h2>Edit Task</h2>
+   </div>
+</div>
+<form action="" method="post">
+   {% csrf_token %}
+   {{form|crispy}}
+   <br>
+   <td><button type="submit">Update</button></td>
+   <td>
+      <button type="submit"onclick="window.location.href='{% url 'task_list' %}'; return false;">Back</button>
+   </td>
+  
+</form>
+{% endblock %}
