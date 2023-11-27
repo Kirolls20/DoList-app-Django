@@ -28,7 +28,12 @@ body{
    color: rgb(247, 247, 247);
    text-decoration: none;
 }
+.action-btn{
+   border:none;
+   background-color: inherit;
+   color:#4b5156;
 
+}
 button {
    border: 1px solid #757575;
    background-color: #EEA390;

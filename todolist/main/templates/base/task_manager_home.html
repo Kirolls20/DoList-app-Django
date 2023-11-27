@@ -1,0 +1,56 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+<head>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+{% block content %}
+   <!-- <script src="{% static 'js/script.js'%}"></script> -->
+   <div class="header-bar">
+      <div>
+         
+         <h2><span>Hello {{request.user.username|title}}</span></h2>
+         <h5><span><i>You have {{tasks_manager.count}} Tasks to manage </i></span></h5>
+          <a href="{% url 'new' %}" class="add-task"> &#10011;</a>
+      </div>
+      {% if user.is_authenticated %}
+         <a href="{% url 'logout' %}">Logout</a>
+       {% else %}
+         <a href="{% url 'login' %}">Login</a>
+         <a href="{% url 'sign_up' %}">SignUp</a>
+      {% endif %}
+   </div>
+   <form method="GET" style="margin: top 20px;margin-right: 20px;margin-bottom: 20px; display: flex;">
+      <input type="text" name="search_txt" placeholder="Search Tasks..">
+      <button type="submit">Search</button>
+   </form>
+   <h3>Task Manager</h3>
+   <div id="tasklist" class="task-items-wrapper">
+    {% for task in tasks_manager %}
+        <ul>
+            <li>
+                {{task.name}} 
+                <div style="display:flex;justify-content: baseline;">
+                    <form action="{% url 'delete_task_manager' task.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" style="border:none;background-color: inherit;">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </form>
+                    <a href="{% url 'edit_task_manager' task.id %}" style="margin-top: 10px; margin-left:10px;">
+                        <i class="fa-solid fa-pen"></i>
+                    </a>
+                    <a href="{% url 'task_list' task.id %}"  style="margin-top: 10px; margin-left:10px; text-decoration: none;">
+                        <i class="fa-regular fa-eye"></i>
+                         <span style="color:green;font-weight: bolder;">{{task.tasks.all.count}}</span>
+                    </a>
+                </div>
+                
+            </li> 
+        </ul>
+        {% empty %}
+        <h3>No Tasks Created</h3>
+    {% endfor  %}      
+   </div>
+<!-- Ajax Code to change task complete value -->
+{% endblock %}
