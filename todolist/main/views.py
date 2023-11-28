@@ -17,6 +17,10 @@ class TaskManagerView(LoginRequiredMixin,ListView):
    model= TaskManager
    context_object_name= 'tasks_manager'
 
+   def get_context_data(self,**kwargs):
+      context = super().get_context_data(**kwargs)
+      context['tasks_manager'] = TaskManager.objects.filter(user=self.request.user)
+      return context
 class CreateTaskManager(LoginRequiredMixin,TemplateView):
    template_name = 'base/create_task_manager.html'
 
@@ -140,16 +144,23 @@ class DeleteTaskView(LoginRequiredMixin,SuccessMessageMixin,DeleteView):
       task_id = self.kwargs['pk']
       task_manager_pk = Task.objects.get(id=task_id).task_manager.id
       return reverse('task_list',kwargs={'pk':task_manager_pk})
+
+
+      
 @method_decorator(csrf_exempt, name='dispatch')
 class UpdateTaskStatusView(LoginRequiredMixin, View):
     def post(self, request, **kwargs):
-        task = get_object_or_404(Task, id=self.kwargs['pk'])
+      task = get_object_or_404(Task, id=self.kwargs['pk'])
         
         # Toggle the completion status
-        task.complete = not task.complete
-        task.save()
+      try:
+         task.complete = not task.complete
+         task.save()
+      except Exception as e:
+         print('ERRRor:',e)
+      return JsonResponse({'task_status': task.complete})
 
-        return JsonResponse({'task_status': task.complete})
+
 class CreateUserView(CreateView):
    template_name='registration/sign-up.html'
    form_class=CreateUserForm

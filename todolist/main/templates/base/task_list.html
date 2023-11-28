@@ -26,14 +26,19 @@
    <div id="tasklist" class="task-items-wrapper">
       {% for task in task_list %}
       <p>
-         <input type="checkbox" name="" id="">
-         <button  type="button" data-bs-toggle="collapse" 
-            data-bs-target="#collapseExample{{ task.id }}" aria-expanded="false"
-            aria-controls="collapseExample{{ task.id }}" style="border:none;background-color: inherit;" >
-             <li>
-               {{ task.title }}  
-            </li>
-         </button>
+         
+            <!-- Task 1 -->
+            <div class="task">
+                <input type="checkbox" id="task-{{task.id}}" class="task-checkbox" data-task-id="{{task.id}}" data-csrf-token='{% csrf_token %}' {% if task.complete %} checked {% endif %}>
+                <label for="task-{{task.id}}" id="task-{{task.id}}" {% if task.complete %} style="text-decoration: line-through;"{% endif %}>{{task.title}}</label>
+                
+                <button  type="button" data-bs-toggle="collapse" 
+                data-bs-target="#collapseExample{{ task.id }}" aria-expanded="false"
+                aria-controls="collapseExample{{ task.id }}" style="border:none;background-color: inherit;" >
+                  
+               </button>
+               
+            </div>
          <div style="display: inline-flex;">
          <a href="{% url 'task_update' task.id %}">
             <i class="fa-solid fa-pen"></i>
@@ -58,4 +63,40 @@
    </form>         
    </div>
 <!-- Ajax Code to change task complete value -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    // Attach click event to the checkbox
+    $('.task-checkbox').on('change', function() {
+        // Get the task ID from the data attribute or any other way you prefer
+        var taskId = $(this).data('task-id');
+        var csrfToken = $(this).data('csrf-token');
+        var labelTask = $('label[for="task-' + taskId + '"]');
+      
+        // Make an AJAX request to update the task status
+        $.ajax({
+            url: `/update_task_status/${taskId}/`,
+            method:'POST',
+            data:{csrfmiddlewaretoken:csrfToken},
+            success: function(data) {
+                // Update the task status and apply strike-through if needed
+                if (data.task_status) {
+                    // Task is complete, apply strike-throug
+                    labelTask.css('text-decoration', 'line-through');
+                    console.log('Checked!!')
+                } else {
+                    // Task is incomplete, remove strike-through
+                    labelTask.css('text-decoration', 'none');
+                    console.log('Not Checked!')
+                }
+                
+            },
+            error: function(error) {
+                console.log('Error:', error);
+            }
+        });
+    });
+});
+</script>
 {% endblock %}
